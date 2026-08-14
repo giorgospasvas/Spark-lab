@@ -10,7 +10,7 @@
 
 <p align="left">
   <a href="https://giorgospasvas.github.io/Spark-lab/" target="_blank" rel="noopener noreferrer">
-    <strong>⚡ Spark Lab Online (Παίξτε εδώ)</strong>
+    <strong>⚡ Spark Lab Online </strong>
   </a>
 </p>
 
