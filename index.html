@@ -130,6 +130,27 @@
                     clearInterval(checkInterval);
                 }, 2500);
             };
-        </script>
+        <script>
+    function removeLoader() {
+        var loader = document.getElementById("custom-loader");
+        if (loader && loader.style.display !== 'none') {
+            loader.style.opacity = '0';
+            setTimeout(function() {
+                loader.style.display = 'none';
+            }, 400);
+        }
+    }
+
+    // Force hide when page is ready or clicked
+    window.addEventListener("load", function() {
+        if (typeof GameMaker_Init === "function") {
+            GameMaker_Init();
+        }
+        setTimeout(removeLoader, 2000);
+    });
+
+    // Immediate safety backup
+    setTimeout(removeLoader, 3500);
+</script>
     </body>
 </html>
