@@ -1,13 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 
-    <!-- Custom PreHead code is injected here -->
-    
-
     <head>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name ="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta charset="utf-8"/>
 
@@ -17,13 +14,83 @@
         <!-- Set the title bar of the page -->
         <title>Spark lab</title>
 
-        <!-- Custom PreStyle code is injected here -->
-        <link rel="icon" type="image/png" href="favicon.ico?v=2">
-            
+        <!-- Favicon -->
+        <link rel="icon" type="image/x-icon" href="./favicon.ico?v=3">
+
+        <!-- Custom Loading Bar Function -->
+        <script type="text/javascript">
+        function custom_loading_bar(ctx, width, height, total, current, image) {
+            // 1. Clear background (Dark theme)
+            ctx.fillStyle = "#0d1117";
+            ctx.fillRect(0, 0, width, height);
+
+            // 2. Draw Splash / Logo centered (if available)
+            if (image) {
+                var imgWidth = image.width;
+                var imgHeight = image.height;
+                var maxW = width * 0.4;
+                if (imgWidth > maxW) {
+                    var scale = maxW / imgWidth;
+                    imgWidth *= scale;
+                    imgHeight *= scale;
+                }
+                var imgX = (width - imgWidth) / 2;
+                var imgY = (height - imgHeight) / 2 - 40;
+                ctx.drawImage(image, imgX, imgY, imgWidth, imgHeight);
+            }
+
+            // 3. Calculate Progress
+            var progress = total > 0 ? (current / total) : 0;
+            progress = Math.min(Math.max(progress, 0), 1);
+
+            // 4. Bar Dimensions
+            var barWidth = Math.min(width * 0.5, 400);
+            var barHeight = 8;
+            var barX = (width - barWidth) / 2;
+            var barY = (height / 2) + 60;
+
+            // 5. Draw Bar Background (Track)
+            ctx.fillStyle = "#21262d";
+            ctx.beginPath();
+            if (ctx.roundRect) {
+                ctx.roundRect(barX, barY, barWidth, barHeight, 4);
+            } else {
+                ctx.rect(barX, barY, barWidth, barHeight);
+            }
+            ctx.fill();
+
+            // 6. Draw Filled Bar (Neon Gradient)
+            if (progress > 0) {
+                var gradient = ctx.createLinearGradient(barX, 0, barX + barWidth, 0);
+                gradient.addColorStop(0, "#58a6ff");
+                gradient.addColorStop(1, "#bc8cff");
+                ctx.fillStyle = gradient;
+
+                ctx.beginPath();
+                var fillWidth = barWidth * progress;
+                if (ctx.roundRect) {
+                    ctx.roundRect(barX, barY, fillWidth, barHeight, 4);
+                } else {
+                    ctx.rect(barX, barY, fillWidth, barHeight);
+                }
+                ctx.fill();
+            }
+
+            // 7. Draw Percentage & Status Text
+            ctx.fillStyle = "#8b949e";
+            ctx.font = "14px 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText("Loading... " + Math.round(progress * 100) + "%", width / 2, barY + 28);
+        }
+
+        window.custom_loading_bar = custom_loading_bar;
+        </script>
+
         <!-- Set the background colour of the document -->
         <style>
             body {
-                background: #0;
+                background: #000000;
                 color: #cccccc;
                 margin: 0px;
                 padding: 0px;
@@ -75,57 +142,28 @@
             /* END - Custom Runner Styles */
             
         </style>
-
-        <!-- Custom PostStyle code is injected here -->
-        
-
-        <!-- Builtin injector for injecting flurry analytics code -->
         
     </head>
 
-    <!-- Custom PostHead code is injected here -->
-    
-
-    <!-- Custom PreBody code is injected here -->
-    
-
     <body>
-        <!-- Custom BodyStart code is injected here -->
-        
-
         <div class="gm4html5_div_class" id="gm4html5_div_id">
-            
-            <!-- Builtin injector for splash screen -->
-            
-
-            <!-- Custom PreCanvas code is injected here -->
-            
-
             <!-- Create the canvas element the game draws to -->
-            <canvas id="canvas" width="1920" height="1080" >
-                
+            <canvas id="canvas" width="1920" height="1080">
                 <p>Your browser doesn't support HTML5 canvas.</p>
             </canvas>
-            
-            <!-- Custom PostCanvas code is injected here -->
-            
         </div>
 
         <!-- Run the game code -->
         <script type="text/javascript" src="html5game/Spark lab (1).js?cachebust=1886549041"></script>
 
-        <!-- Builtin injector for injecting runner path -->
-        
-
-        <script>window.onload = GameMaker_Init;</script>
-
-        <!-- Builtin injector for injecting google analytics code -->
-        
-
-        <!-- Custom BodyEnd code is injected here -->
+        <script>
+            window.onload = function() {
+                if (typeof(g_pLoadingBar) !== "undefined") {
+                    g_pLoadingBar = custom_loading_bar;
+                }
+                GameMaker_Init();
+            };
+        </script>
         
     </body>
-
-    <!-- Custom PostBody code is injected here -->
-    
 </html>
