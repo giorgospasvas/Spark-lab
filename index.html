@@ -40,7 +40,7 @@
                 border: 0px;
             }
 
-            /* Sleek Modern Loader Overlay */
+            /* Modern Loader Overlay */
             #custom-loader {
                 position: fixed;
                 top: 0;
@@ -53,7 +53,8 @@
                 justify-content: center;
                 align-items: center;
                 z-index: 99999;
-                transition: opacity 0.4s ease;
+                transition: opacity 0.5s ease;
+                pointer-events: none; /* Prevents clicks from being blocked */
             }
 
             .spinner {
@@ -98,22 +99,35 @@
         <script type="text/javascript" src="html5game/Spark lab (1).js?cachebust=1886549041"></script>
 
         <script>
+            function removeLoader() {
+                var loader = document.getElementById("custom-loader");
+                if (loader && loader.style.display !== 'none') {
+                    loader.style.opacity = '0';
+                    setTimeout(function() {
+                        loader.style.display = 'none';
+                    }, 500);
+                }
+            }
+
             window.onload = function() {
                 if (typeof GameMaker_Init === "function") {
                     GameMaker_Init();
                 }
 
-                // Hide the loader as soon as the game loop starts
-                var checkInit = setInterval(function() {
-                    var loader = document.getElementById("custom-loader");
-                    if (window.g_pGMRunner && window.g_pGMRunner.m_bInit) {
-                        loader.style.opacity = '0';
-                        setTimeout(function() {
-                            loader.style.display = 'none';
-                        }, 400);
-                        clearInterval(checkInit);
+                // 1. Check for standard GameMaker execution
+                var checkInterval = setInterval(function() {
+                    var runner = window.g_pGMRunner || (typeof g_pGMRunner !== "undefined" ? g_pGMRunner : null);
+                    if (runner && (runner.m_bInit || runner.m_InitState > 0 || runner.m_pAudioEngine)) {
+                        removeLoader();
+                        clearInterval(checkInterval);
                     }
                 }, 100);
+
+                // 2. Safety Fallback: Automatically dismiss loader after 2.5 seconds
+                setTimeout(function() {
+                    removeLoader();
+                    clearInterval(checkInterval);
+                }, 2500);
             };
         </script>
     </body>
