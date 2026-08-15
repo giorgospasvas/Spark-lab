@@ -10,7 +10,7 @@
         <meta http-equiv="pragma" content="no-cache"/>
 
         <title>Spark lab</title>
-        <link rel="icon" type="image/x-icon" href="./favicon.ico?v=3">
+        <link rel="icon" type="image/x-icon" href="./favicon.ico?v=5">
 
         <style>
             body {
@@ -41,7 +41,7 @@
                 border: 0px;
             }
 
-            /* Modern Loader Overlay */
+            /* Fullscreen Overlay Container */
             #custom-loader {
                 position: fixed;
                 top: 0;
@@ -55,39 +55,81 @@
                 align-items: center;
                 z-index: 99999;
                 transition: opacity 0.5s ease;
-                pointer-events: none; /* Prevents clicks from being blocked */
+                pointer-events: none;
             }
 
-            .spinner {
-                width: 50px;
-                height: 50px;
-                border: 4px solid rgba(255, 255, 255, 0.1);
-                border-top: 4px solid #58a6ff;
-                border-radius: 50%;
-                animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+            /* Animated Logo Loader Styles */
+            .logo-loader-container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
             }
 
-            @keyframes spin {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
+            .pulsing-logo {
+                width: 120px;
+                height: auto;
+                animation: logo-glow-pulse 1.8s ease-in-out infinite;
+                filter: drop-shadow(0 0 15px rgba(88, 166, 255, 0.4));
+            }
+
+            .mini-bar {
+                width: 180px;
+                height: 4px;
+                background: #21262d;
+                border-radius: 4px;
+                margin-top: 25px;
+                overflow: hidden;
+                position: relative;
+            }
+
+            .mini-bar::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -50%;
+                width: 50%;
+                height: 100%;
+                background: linear-gradient(90deg, #58a6ff, #bc8cff);
+                border-radius: 4px;
+                animation: bar-slide 1.2s infinite ease-in-out;
             }
 
             .loader-text {
-                margin-top: 20px;
+                margin-top: 14px;
                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                font-size: 16px;
-                font-weight: 500;
+                font-size: 13px;
                 color: #8b949e;
-                letter-spacing: 1px;
+                letter-spacing: 1.5px;
+                text-transform: uppercase;
+            }
+
+            @keyframes logo-glow-pulse {
+                0%, 100% {
+                    transform: scale(1);
+                    filter: drop-shadow(0 0 8px rgba(88, 166, 255, 0.3));
+                }
+                50% {
+                    transform: scale(1.08);
+                    filter: drop-shadow(0 0 25px rgba(88, 166, 255, 0.85));
+                }
+            }
+
+            @keyframes bar-slide {
+                0% { left: -50%; }
+                100% { left: 100%; }
             }
         </style>
     </head>
 
     <body>
-        <!-- Modern Spinner Overlay -->
+        <!-- Animated Custom Loader Overlay -->
         <div id="custom-loader">
-            <div class="spinner"></div>
-            <div class="loader-text">Loading Spark Lab...</div>
+            <div class="logo-loader-container">
+                <img src="./favicon.ico" class="pulsing-logo" alt="Spark Lab Logo">
+                <div class="mini-bar"></div>
+                <div class="loader-text">Loading Spark Lab...</div>
+            </div>
         </div>
 
         <div class="gm4html5_div_class" id="gm4html5_div_id">
@@ -100,57 +142,41 @@
         <script type="text/javascript" src="html5game/Spark lab (1).js?cachebust=1886549041"></script>
 
         <script>
-            function removeLoader() {
+            function hideLoader() {
                 var loader = document.getElementById("custom-loader");
-                if (loader && loader.style.display !== 'none') {
-                    loader.style.opacity = '0';
+                if (loader && loader.style.display !== "none") {
+                    loader.style.opacity = "0";
                     setTimeout(function() {
-                        loader.style.display = 'none';
+                        loader.style.display = "none";
                     }, 500);
                 }
             }
 
-            window.onload = function() {
-                if (typeof GameMaker_Init === "function") {
-                    GameMaker_Init();
-                }
-
-                // 1. Check for standard GameMaker execution
-                var checkInterval = setInterval(function() {
-                    var runner = window.g_pGMRunner || (typeof g_pGMRunner !== "undefined" ? g_pGMRunner : null);
-                    if (runner && (runner.m_bInit || runner.m_InitState > 0 || runner.m_pAudioEngine)) {
-                        removeLoader();
-                        clearInterval(checkInterval);
+            // Start GameMaker
+            if (typeof GameMaker_Init === "function") {
+                GameMaker_Init();
+            } else {
+                window.addEventListener("load", function() {
+                    if (typeof GameMaker_Init === "function") {
+                        GameMaker_Init();
                     }
-                }, 100);
+                });
+            }
 
-                // 2. Safety Fallback: Automatically dismiss loader after 2.5 seconds
-                setTimeout(function() {
-                    removeLoader();
-                    clearInterval(checkInterval);
-                }, 2500);
-            };
-        <script>
-    function removeLoader() {
-        var loader = document.getElementById("custom-loader");
-        if (loader && loader.style.display !== 'none') {
-            loader.style.opacity = '0';
+            // Hide loader as soon as the engine runner is active
+            var checkEngine = setInterval(function() {
+                var runner = window.g_pGMRunner || (typeof g_pGMRunner !== "undefined" ? g_pGMRunner : null);
+                if (runner) {
+                    hideLoader();
+                    clearInterval(checkEngine);
+                }
+            }, 100);
+
+            // Safety limit: dismiss loader after 2 seconds regardless of runner state
             setTimeout(function() {
-                loader.style.display = 'none';
-            }, 400);
-        }
-    }
-
-    // Force hide when page is ready or clicked
-    window.addEventListener("load", function() {
-        if (typeof GameMaker_Init === "function") {
-            GameMaker_Init();
-        }
-        setTimeout(removeLoader, 2000);
-    });
-
-    // Immediate safety backup
-    setTimeout(removeLoader, 3500);
-</script>
+                hideLoader();
+                clearInterval(checkEngine);
+            }, 2000);
+        </script>
     </body>
 </html>
